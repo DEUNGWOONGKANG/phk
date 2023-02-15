@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ManagerMapper">
+
+	<!--직원 로그인-->
+	<select id="managerLogin" resultType="com.project.mj.manager.domain.ManagerVO">
+		SELECT ID, PW, NAME, STATUS, POSITION
+		  FROM MANAGER
+		 WHERE ID = #{id}
+		   AND PW = #{pw}
+	</select>
+	
+	<!--직원리스트 조회-->
+	<select id="getManagerList" resultType="com.project.mj.manager.domain.ManagerVO">
+		SELECT ID, NAME, TEL1, TEL2, TEL3
+			 , ETCTEL1, ETCTEL2, ETCTEL3
+			 , STATUS, POSITION
+		  FROM MANAGER
+		 WHERE 1=1
+		   <if test="searchStatus != 9 and searchStatus != null">
+		   AND status = #{searchStatus}
+		   </if>
+		   <if test="searchKeyword != '' and searchKeyword != null">
+			   <if test="searchKey == 'name'">
+				   AND name like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+			   <if test="searchKey == 'tel'">
+				   AND CONCAT(TEL1,'-',TEL2,'-',TEL3) like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+			   <if test="searchKey == 'id'">
+				   AND id like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+		   </if>
+		 ORDER BY ID DESC 
+		 <if test="cri != null">
+		 LIMIT #{cri.rowStart}, 10
+		 </if>
+	</select>
+	
+	<!--직원 인원수 조회-->
+	<select id="managerCnt" resultType="int">
+		SELECT COUNT(ID)
+		  FROM MANAGER
+		 WHERE 1=1
+		   <if test="searchStatus != 9 and searchStatus != null">
+		   AND status = #{searchStatus}
+		   </if>
+		   <if test="searchKeyword != '' and searchKeyword != null">
+			   <if test="searchKey == 'name'">
+				   AND name like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+			   <if test="searchKey == 'tel'">
+				   AND CONCAT(TEL1,'-',TEL2,'-',TEL3) like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+			   <if test="searchKey == 'id'">
+				   AND id like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+		   </if>
+	</select>
+	
+	<!--공지사항 조회-->
+	<select id="getBoard" resultType="com.project.mj.manager.domain.BoardVO">
+		SELECT ID, TITLE, WRITER, CONTENT, CREATED
+		  FROM BOARD
+		 WHERE 1=1
+		   AND ID = #{id}
+	</select>
+	
+	<!--공지사항 조회-->
+	<select id="getBoardList" resultType="com.project.mj.manager.domain.BoardVO">
+		SELECT ID, TITLE, WRITER, CONTENT, CREATED
+		  FROM BOARD
+		 WHERE 1=1
+		   <if test="searchWriter != '' and searchWriter != null">
+			   AND WRITER like CONCAT('%',#{searchWriter},'%')
+		   </if>
+		   <if test="searchTitle != '' and searchTitle != null">
+			   AND TITLE like CONCAT('%',#{searchTitle},'%')
+		   </if>
+		   <if test="startdate != '' and startdate != null and enddate != '' and enddate != null">
+			   AND DATE_FORMAT(CREATED, '%Y-%m-%d') BETWEEN #{startdate} AND #{enddate}
+		   </if>
+		 ORDER BY CREATED DESC 
+		 <if test="cri != null">
+		 LIMIT #{cri.rowStart}, 10
+		 </if>
+	</select>
+	
+	<!--직원 인원수 조회-->
+	<select id="getBoardCnt" resultType="int">
+		SELECT COUNT(ID)
+		  FROM BOARD
+		 WHERE 1=1
+		   <if test="searchWriter != '' and searchWriter != null">
+			   AND WRITER like CONCAT('%',#{searchWriter},'%')
+		   </if>
+		   <if test="searchTitle != '' and searchTitle != null">
+			   AND TITLE like CONCAT('%',#{searchTitle},'%')
+		   </if>
+		   <if test="startdate != '' and startdate != null and enddate != '' and enddate != null">
+			   AND DATE_FORMAT(CREATED, '%Y-%m-%d') BETWEEN #{startdate} AND #{enddate}
+		   </if>
+	</select>
+	
+	<!--직원 인원수 조회-->
+	<select id="customerDupCheck" resultType="int">
+		SELECT COUNT(ID)
+		  FROM CUSTOMER
+		 WHERE 1=1
+		   AND TEL1 = #{tel1}
+		   AND TEL2 = #{tel2}
+		   AND TEL3 = #{tel3}
+	</select>
+	
+	<!--직원 인원수 조회-->
+	<select id="getCustomerId" resultType="int">
+		SELECT ID
+		  FROM CUSTOMER
+		 WHERE 1=1
+		   AND TEL1 = #{tel1}
+		   AND TEL2 = #{tel2}
+		   AND TEL3 = #{tel3}
+	</select>
+	
+	<!--고객리스트 조회-->
+	<select id="getCustomerList" resultType="com.project.mj.manager.domain.CustomerVO">
+		SELECT A.ID, A.NAME, A.REG_NUM1, A.REG_NUM2, A.JOB
+			 , A.TEL1, A.TEL2, A.TEL3, A.RECEIVE, A.STATUS
+			 , (SELECT MEMO FROM MEMO WHERE CUSTOMERID = A.ID ORDER BY CREATED DESC LIMIT 1) AS MEMO
+			 , A.MANAGE_YN, A.MANAGER, A.CREATED
+		  FROM CUSTOMER A
+		 WHERE 1=1
+		   <if test="manager != '' and manager != null ">
+		   AND A.MANAGER = #{manager}
+		   </if>
+		   <if test="searchStatus != '' and searchStatus != null">
+		   AND A.STATUS = #{searchStatus}
+		   </if>
+		   <if test="searchKeyword != '' and searchKeyword != null">
+			   <if test="searchKey == 'name'">
+				   AND A.NAME like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+			   <if test="searchKey == 'tel'">
+				   AND CONCAT(A.TEL1,'-',A.TEL2,'-',A.TEL3) like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+			   <if test="searchKey == 'receive'">
+				   AND A.RECEIVE like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+			   <if test="searchKey == 'job'">
+				   AND A.JOB like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+			   <if test="searchKey == 'manager'">
+				   AND A.MANAGER IN (
+								   SELECT ID 
+								     FROM MANAGER
+								    WHERE NAME = #{searchKeyword}
+								    )
+			   </if>
+		   </if>
+		   <if test="startdate != '' and startdate != null ">
+		   AND A.CREATED <![CDATA[>]]> CONCAT(#{startdate},' 00:00:00')
+		   </if>
+		   <if test="enddate != '' and enddate != null ">
+		   AND A.CREATED <![CDATA[<]]> CONCAT(#{enddate}, ' 23:59:59')
+		   </if>
+		 ORDER BY A.ID DESC 
+		 LIMIT #{cri.rowStart}, 10
+	</select>
+	
+	<!--엑셀다운로드용 전체 고객리스트 조회-->
+	<select id="getCustomerAll" resultType="com.project.mj.manager.domain.CustomerVO">
+		SELECT A.ID, A.NAME, A.REG_NUM1, A.REG_NUM2, A.JOB
+			 , A.TEL1, A.TEL2, A.TEL3, A.RECEIVE, A.STATUS
+			 , (SELECT MEMO FROM MEMO WHERE CUSTOMERID = A.ID ORDER BY CREATED DESC LIMIT 1) AS MEMO
+			 , A.MANAGE_YN, A.MANAGER, A.CREATED
+		  FROM CUSTOMER A
+		 ORDER BY A.ID DESC 
+	</select>
+	
+	<!--일지리스트 조회-->
+	<select id="getDailyLogList" resultType="com.project.mj.manager.domain.DailyLogVO">
+		SELECT ID, NAME, REFEREE, CUSTOMERID, FC
+			 , MONEY, DMONEY, DBDATE, DEPOSITDATE, MANAGER
+			 , STATUS
+		  FROM DAILYLOG
+		 WHERE 1=1
+		   <if test="dbstartdate != '' and dbstartdate != null and dbenddate != '' and dbenddate != null">
+		   AND DBDATE BETWEEN #{dbstartdate} AND #{dbenddate}
+		   </if>
+		   <if test="depositstartdate != '' and depositstartdate != null and depositenddate != '' and depositenddate != null">
+		   AND DEPOSITDATE BETWEEN #{depositstartdate} AND #{depositenddate}
+		   </if>
+		   <if test="manager != '' and manager != null ">
+		   AND MANAGER like CONCAT('%',#{manager},'%')
+		   </if>
+		   <if test="name != '' and name != null ">
+		   AND NAME like CONCAT('%',#{name},'%')
+		   </if>
+		   <if test="searchStatus != 9 and searchStatus != null">
+		   AND status = #{searchStatus}
+		   </if>
+		 ORDER BY ID DESC 
+		 LIMIT #{cri.rowStart}, 10
+	</select>
+	
+	<!--일지 조회-->
+	<select id="getDailyLog" resultType="com.project.mj.manager.domain.DailyLogVO">
+		SELECT ID, NAME, REFEREE, CUSTOMERID, FC
+			 , MONEY, DMONEY, DBDATE, DEPOSITDATE, MANAGER
+		  FROM DAILYLOG
+		 WHERE 1=1
+		   AND ID = #{id}
+	</select>
+	
+	<!--그래프 조회-->
+	<select id="getGraphList" resultType="com.project.mj.manager.domain.DailyLogVO">
+		SELECT MANAGER, SUM(MONEY) AS MONEY, SUM(DMONEY) AS DMONEY, SUM(MONEY)-SUM(DMONEY) AS DIFFMONEY
+			   ,(SELECT SUM(MONEY) 
+				FROM DAILYLOG WHERE STATUS = 1
+			   AND DEPOSITDATE BETWEEN #{dbstartdate} AND #{dbenddate}) AS TOTALMONEY
+			   ,(SELECT SUM(DMONEY) 
+				FROM DAILYLOG WHERE STATUS = 1
+			   AND DEPOSITDATE BETWEEN #{dbstartdate} AND #{dbenddate}) AS TOTALDMONEY
+		  FROM DAILYLOG
+		 WHERE STATUS = 1
+		   <if test="dbstartdate != '' and dbstartdate != null and dbenddate != '' and dbenddate != null">
+		   AND DEPOSITDATE BETWEEN #{dbstartdate} AND #{dbenddate}
+		   </if>
+		 GROUP BY MANAGER
+	</select>
+	
+	<!--일지리스트 조회-->
+	<select id="dailyLogCnt" resultType="int">
+		SELECT COUNT(ID)
+		  FROM DAILYLOG
+		 WHERE 1=1
+		   <if test="dbstartdate != '' and dbstartdate != null and dbenddate != '' and dbenddate != null">
+		   AND DBDATE BETWEEN #{dbstartdate} AND #{dbenddate}
+		   </if>
+		   <if test="depositstartdate != '' and depositstartdate != null and depositenddate != '' and depositenddate != null">
+		   AND DEPOSITDATE BETWEEN #{depositstartdate} AND #{depositenddate}
+		   </if>
+		   <if test="manager != '' and manager != null ">
+		   AND MANAGER like CONCAT('%',#{manager},'%')
+		   </if>
+		   <if test="name != '' and name != null ">
+		   AND NAME like CONCAT('%',#{name},'%')
+		   </if>
+		   <if test="searchStatus != 9 and searchStatus != null">
+		   AND status = #{searchStatus}
+		   </if>
+	</select>
+	
+	<!--고객정보 조회-->
+	<select id="getCustomerInfo" resultType="com.project.mj.manager.domain.CustomerVO">
+		SELECT ID, NAME, REG_NUM1, REG_NUM2, JOB
+			 , TEL1, TEL2, TEL3, RECEIVE, STATUS
+			 , MEMO, MANAGE_YN, MANAGER, CREATED
+		  FROM CUSTOMER
+		 WHERE ID = #{id}
+	</select>
+	
+	<!--직원정보 조회-->
+	<select id="getManagerInfo" resultType="com.project.mj.manager.domain.ManagerVO">
+		SELECT SEQ, ID, PW, NAME, TEL1, TEL2, TEL3,
+			   ETCTEL1, ETCTEL2, ETCTEL3, STATUS,
+			   POSITION, CREATED 
+		  FROM MANAGER
+		 WHERE ID = #{id}
+	</select>
+	
+	<!--금융사 조회-->
+	<select id="getFcList" resultType="com.project.mj.manager.domain.FcVO">
+		SELECT ID, NAME, CREATED
+		  FROM FC
+	</select>
+	
+	<!--IP 조회-->
+	<select id="getConfirmIpList" resultType="com.project.mj.manager.domain.ConfirmVO">
+		SELECT ID, IP, CREATED
+		  FROM CONFIRMIP
+	</select>
+	
+	<!--상태값 조회-->
+	<select id="getStatusList" resultType="com.project.mj.manager.domain.StatusVO">
+		SELECT ID, NAME, CREATED
+		  FROM STATUS
+		 ORDER BY ID DESC 
+	</select>
+	
+	<!--상태값 조회-->
+	<select id="getMemoList" resultType="com.project.mj.manager.domain.MemoVO">
+		SELECT A.ID, A.CUSTOMERID, A.WRITER, A.MEMO, A.CREATED
+	  	,(SELECT NAME FROM MANAGER WHERE ID = A.WRITER) AS MANAGER
+		FROM MEMO A
+		WHERE CUSTOMERID = #{id}
+		ORDER BY A.CREATED DESC
+	</select>
+	
+	<!--고객 총 인원수-->
+	<select id="customerCnt" resultType="int">
+		SELECT COUNT(ID)
+		  FROM CUSTOMER
+		 WHERE 1=1
+		   <if test="searchStatus != '' and searchStatus != null">
+		   AND status = #{searchStatus}
+		   </if>
+		   <if test="searchKeyword != '' and searchKeyword != null">
+			   <if test="searchKey == 'name'">
+				   AND name like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+			   <if test="searchKey == 'tel'">
+				   AND CONCAT(TEL1,'-',TEL2,'-',TEL3) like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+			   <if test="searchKey == 'receive'">
+				   AND receive like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+			   <if test="searchKey == 'job'">
+				   AND job like CONCAT('%',#{searchKeyword},'%')
+			   </if>
+			   <if test="searchKey == 'manager'">
+				   AND manager IN (
+								   SELECT ID 
+								     FROM MANAGER
+								    WHERE NAME = #{searchKeyword}
+								    )
+			   </if>
+		   </if>
+		   <if test="startdate != '' and startdate != null ">
+		   AND created <![CDATA[>]]> CONCAT(#{startdate},' 00:00:00')
+		   </if>
+		   <if test="enddate != '' and enddate != null ">
+		   AND created <![CDATA[<]]> CONCAT(#{enddate},' 23:59:59')
+		   </if>
+	</select>
+	
+	<!--공지 삭제-->
+	<delete id="deleteBoard">
+		DELETE FROM BOARD
+		 WHERE ID = #{id}
+	</delete>
+	
+	<!--메모 삭제-->
+	<delete id="deleteMemo">
+		DELETE FROM MEMO
+		 WHERE ID = #{id}
+	</delete>
+	
+	<!--고객 삭제-->
+	<delete id="deleteCustomer">
+		DELETE FROM CUSTOMER
+		 WHERE ID = #{id}
+	</delete>
+	
+	<!--일지 삭제-->
+	<delete id="deleteLog">
+		DELETE FROM DAILYLOG
+		 WHERE ID = #{id}
+	</delete>
+	
+	<!--고객 삭제-->
+	<delete id="deleteManager">
+		DELETE FROM MANAGER
+		 WHERE ID = #{id}
+	</delete>
+	
+	<!--금융사 삭제-->
+	<delete id="deleteFc">
+		DELETE FROM FC
+		 WHERE ID = #{id}
+	</delete>
+	
+	<!--IP 삭제-->
+	<delete id="deleteIp">
+		DELETE FROM CONFIRMIP
+		 WHERE ID = #{id}
+	</delete>
+	
+	<!--상태값 삭제-->
+	<delete id="deleteStatus">
+		DELETE FROM STATUS
+		 WHERE ID = #{id}
+	</delete>
+	
+	<!--고객 추가-->
+	<insert id="insertBoard">
+		INSERT INTO BOARD
+			(TITLE, WRITER, CONTENT, CREATED)
+		VALUES
+			(#{title}, #{writer}, #{content}, now())
+	</insert>
+	
+	<!--고객 추가-->
+	<insert id="insertCustomer">
+		INSERT INTO CUSTOMER
+			(NAME, REG_NUM1, REG_NUM2, JOB, TEL1, TEL2, TEL3, RECEIVE, STATUS, MANAGER, CREATED)
+		VALUES
+			(#{name}, #{reg_num1}, #{reg_num2}, #{job}, #{tel1}, #{tel2}, #{tel3}, #{receive}, #{status}, #{manager}, now())
+	</insert>
+	
+	<!--메모 추가-->
+	<insert id="insertMemo">
+		INSERT INTO MEMO
+			(CUSTOMERID, WRITER, MEMO)
+		VALUES
+			(#{id} ,#{manager}, #{memo})
+	</insert>
+	
+	<!--직원 추가-->
+	<insert id="insertManager">
+		INSERT INTO MANAGER
+			(ID, PW, NAME, TEL1, TEL2, TEL3, ETCTEL1, ETCTEL2, ETCTEL3, STATUS, POSITION, CREATED)
+		VALUES
+			(#{id}, #{pw}, #{name}, #{tel1}, #{tel2}, #{tel3}, #{etctel1}, #{etctel2}, #{etctel3}, #{status}, #{position}, now())
+	</insert>
+	
+	<!--일지 추가-->
+	<insert id="insertDailyLog">
+		INSERT INTO DAILYLOG
+			(REFEREE, NAME, STATUS, CUSTOMERID, FC, MONEY, DMONEY, DBDATE, DEPOSITDATE, MANAGER, CREATED)
+		VALUES
+			(#{referee}, #{name}, #{status}, #{customerId}, #{fc}, #{money}, #{dmoney}, #{dbDate}, #{depositDate}, #{manager}, now())
+	</insert>
+	
+	<!--상태값 추가-->
+	<insert id="insertStatus">
+		INSERT INTO STATUS
+			(NAME, CREATED)
+		VALUES
+			(#{name}, now())
+	</insert>
+	
+	<!--금융사 추가-->
+	<insert id="insertFc">
+		INSERT INTO FC
+			(NAME, CREATED)
+		VALUES
+			(#{name}, now())
+	</insert>
+	
+	<!--IP 추가-->
+	<insert id="insertIP">
+		INSERT INTO CONFIRMIP
+			(IP, CREATED)
+		VALUES
+			(#{ip}, now())
+	</insert>
+	
+	<!-- 고객수정 -->
+	<update id="updateCustomer">
+		UPDATE CUSTOMER 
+					SET
+				NAME = #{name}
+			  , REG_NUM1 = #{reg_num1}
+			  , REG_NUM2 = #{reg_num2}
+			  , JOB = #{job}
+			  , TEL1 = #{tel1} 
+			  , TEL2 = #{tel2}
+			  , TEL3 = #{tel3}
+			  , RECEIVE = #{receive}
+			  , STATUS = #{status}
+			  , MANAGER = #{manager}
+			  WHERE ID = #{id}
+	</update>
+	
+	<!-- 공지수정 -->
+	<update id="updateBoard">
+		UPDATE BOARD 
+					SET
+				TITLE = #{title}
+			  , CONTENT = #{content}
+			  WHERE ID = #{id}
+	</update>
+	<!-- 고객수정 -->
+	<update id="changeStatus">
+		UPDATE CUSTOMER 
+					SET
+			  STATUS = (SELECT NAME 
+			              FROM STATUS
+			             WHERE ID = #{status}
+			            )
+			  WHERE ID = #{id}
+	</update>
+	<!-- 고객수정 -->
+	<update id="changeManager">
+		UPDATE CUSTOMER 
+					SET
+			  MANAGER = #{manager}
+			  WHERE ID = #{id}
+	</update>
+	
+	<!-- 일지 상태값 변경 -->
+	<update id="updateLogStatus">
+		UPDATE DAILYLOG 
+					SET
+				STATUS = #{status}
+			  WHERE ID = #{id}
+	</update>
+	
+	<!-- 직원수정 -->
+	<update id="updateManager">
+		UPDATE MANAGER 
+					SET
+			   NAME = #{name}
+			  , TEL1 = #{tel1}
+			  , TEL2 = #{tel2}
+			  , TEL3 = #{tel3}
+			  , TEL1 = #{tel1}
+			  , TEL2 = #{tel2}
+			  , TEL3 = #{tel3}
+			  , POSITION = #{position}
+			  , STATUS = #{status}
+			  WHERE ID = #{id}
+	</update>
+	
+	<!-- 일지수정 -->
+	<update id="updateDailyLog">
+		UPDATE DAILYLOG 
+					SET
+			   REFEREE = #{referee}
+			  , FC = #{fc}
+			  , MONEY = #{money}
+			  , DMONEY = #{dmoney}
+			  , DBDATE = #{dbDate}
+			  , DEPOSITDATE = #{depositDate}
+			  WHERE ID = #{id}
+	</update>
+
+</mapper>
