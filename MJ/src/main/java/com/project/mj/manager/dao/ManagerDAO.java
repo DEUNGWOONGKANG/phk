@@ -16,6 +16,7 @@ import com.project.mj.manager.domain.ManagerVO;
 import com.project.mj.manager.domain.MemoVO;
 import com.project.mj.manager.domain.SearchVO;
 import com.project.mj.manager.domain.StatusVO;
+import com.project.mj.manager.domain.TeamVO;
 
 @Repository
 public class ManagerDAO {
@@ -198,6 +199,18 @@ public class ManagerDAO {
 
 	public void deleteMemo(int id) {
 		sqlSession.delete(namespace+".deleteMemo", id);
+	}
+
+	public List<TeamVO> getTeamList() {
+		return sqlSession.selectList(namespace+".getTeamList");
+	}
+
+	public void deleteTeam(int id) {
+		sqlSession.delete(namespace+".deleteTeam", id);
+	}
+
+	public int insertTeam(TeamVO team) {
+		return sqlSession.insert(namespace+".insertTeam", team);
 	}
 	 
 }

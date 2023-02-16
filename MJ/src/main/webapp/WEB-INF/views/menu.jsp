@@ -36,6 +36,8 @@
     </li>
     <li class="sidebar-list-item" id="menu6"><a id="menu6a" href="/menu/menu6" class="sidebar-link text-muted"><i class="o-document-1 mr-3 text-gray"></i><span><b>상태값 관리</b></span></a>
     </li>
+    <li class="sidebar-list-item" id="menu7"><a id="menu7a" href="/menu/menu7" class="sidebar-link text-muted"><i class="o-id-card-1 mr-3 text-gray"></i><span><b>팀 관리</b></span></a>
+    </li>
   </ul>
 </div>
 </body>

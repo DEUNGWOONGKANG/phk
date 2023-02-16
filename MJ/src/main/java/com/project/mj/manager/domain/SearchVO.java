@@ -15,6 +15,7 @@ public class SearchVO {
 	private String depositenddate;
 	private String searchWriter;
 	private String searchTitle;
+	private Integer teamId;
 	private Criteria cri;
 	public String getSearchKey() {
 		return searchKey;
@@ -99,6 +100,12 @@ public class SearchVO {
 	}
 	public void setSearchTitle(String searchTitle) {
 		this.searchTitle = searchTitle;
+	}
+	public Integer getTeamId() {
+		return teamId;
+	}
+	public void setTeamId(Integer teamId) {
+		this.teamId = teamId;
 	}
 	
 }

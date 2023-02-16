@@ -4,7 +4,7 @@
 
 	<!--직원 로그인-->
 	<select id="managerLogin" resultType="com.project.mj.manager.domain.ManagerVO">
-		SELECT ID, PW, NAME, STATUS, POSITION
+		SELECT ID, PW, NAME, STATUS, POSITION, TEAM_ID
 		  FROM MANAGER
 		 WHERE ID = #{id}
 		   AND PW = #{pw}
@@ -12,26 +12,28 @@
 	
 	<!--직원리스트 조회-->
 	<select id="getManagerList" resultType="com.project.mj.manager.domain.ManagerVO">
-		SELECT ID, NAME, TEL1, TEL2, TEL3
-			 , ETCTEL1, ETCTEL2, ETCTEL3
-			 , STATUS, POSITION
-		  FROM MANAGER
+		SELECT A.ID, A.NAME, A.TEL1, A.TEL2, A.TEL3
+			 , A.ETCTEL1, A.ETCTEL2, A.ETCTEL3
+			 , A.STATUS, A.POSITION, A.TEAM_ID, B.NAME AS TEAM_NAME
+		  FROM MANAGER A
+		  	LEFT OUTER JOIN TEAM B
+		  	ON A.TEAM_ID = B.ID
 		 WHERE 1=1
 		   <if test="searchStatus != 9 and searchStatus != null">
-		   AND status = #{searchStatus}
+		   AND A.status = #{searchStatus}
 		   </if>
 		   <if test="searchKeyword != '' and searchKeyword != null">
 			   <if test="searchKey == 'name'">
-				   AND name like CONCAT('%',#{searchKeyword},'%')
+				   AND A.name like CONCAT('%',#{searchKeyword},'%')
 			   </if>
 			   <if test="searchKey == 'tel'">
-				   AND CONCAT(TEL1,'-',TEL2,'-',TEL3) like CONCAT('%',#{searchKeyword},'%')
+				   AND CONCAT(A.TEL1,'-',A.TEL2,'-',A.TEL3) like CONCAT('%',#{searchKeyword},'%')
 			   </if>
 			   <if test="searchKey == 'id'">
-				   AND id like CONCAT('%',#{searchKeyword},'%')
+				   AND A.id like CONCAT('%',#{searchKeyword},'%')
 			   </if>
 		   </if>
-		 ORDER BY ID DESC 
+		 ORDER BY A.ID DESC 
 		 <if test="cri != null">
 		 LIMIT #{cri.rowStart}, 10
 		 </if>
@@ -129,7 +131,12 @@
 			 , (SELECT MEMO FROM MEMO WHERE CUSTOMERID = A.ID ORDER BY CREATED DESC LIMIT 1) AS MEMO
 			 , A.MANAGE_YN, A.MANAGER, A.CREATED
 		  FROM CUSTOMER A
+		  	LEFT OUTER JOIN MANAGER B
+		  	ON A.MANAGER = B.ID
 		 WHERE 1=1
+		   <if test="teamId != '' and teamId != null ">
+		   AND B.TEAM_ID = #{teamId}
+		   </if>
 		   <if test="manager != '' and manager != null ">
 		   AND A.MANAGER = #{manager}
 		   </if>
@@ -264,7 +271,7 @@
 	<select id="getManagerInfo" resultType="com.project.mj.manager.domain.ManagerVO">
 		SELECT SEQ, ID, PW, NAME, TEL1, TEL2, TEL3,
 			   ETCTEL1, ETCTEL2, ETCTEL3, STATUS,
-			   POSITION, CREATED 
+			   POSITION, CREATED, TEAM_ID 
 		  FROM MANAGER
 		 WHERE ID = #{id}
 	</select>
@@ -285,6 +292,13 @@
 	<select id="getStatusList" resultType="com.project.mj.manager.domain.StatusVO">
 		SELECT ID, NAME, CREATED
 		  FROM STATUS
+		 ORDER BY ID DESC 
+	</select>
+	
+	<!--팀 조회-->
+	<select id="getTeamList" resultType="com.project.mj.manager.domain.TeamVO">
+		SELECT ID, NAME
+		  FROM TEAM
 		 ORDER BY ID DESC 
 	</select>
 	
@@ -382,6 +396,11 @@
 		 WHERE ID = #{id}
 	</delete>
 	
+	<delete id="deleteTeam">
+		DELETE FROM TEAM
+		 WHERE ID = #{id}
+	</delete>
+	
 	<!--고객 추가-->
 	<insert id="insertBoard">
 		INSERT INTO BOARD
@@ -409,9 +428,9 @@
 	<!--직원 추가-->
 	<insert id="insertManager">
 		INSERT INTO MANAGER
-			(ID, PW, NAME, TEL1, TEL2, TEL3, ETCTEL1, ETCTEL2, ETCTEL3, STATUS, POSITION, CREATED)
+			(ID, PW, NAME, TEL1, TEL2, TEL3, ETCTEL1, ETCTEL2, ETCTEL3, STATUS, POSITION, CREATED, TEAM_ID)
 		VALUES
-			(#{id}, #{pw}, #{name}, #{tel1}, #{tel2}, #{tel3}, #{etctel1}, #{etctel2}, #{etctel3}, #{status}, #{position}, now())
+			(#{id}, #{pw}, #{name}, #{tel1}, #{tel2}, #{tel3}, #{etctel1}, #{etctel2}, #{etctel3}, #{status}, #{position}, now(), #{team_id})
 	</insert>
 	
 	<!--일지 추가-->
@@ -428,6 +447,14 @@
 			(NAME, CREATED)
 		VALUES
 			(#{name}, now())
+	</insert>
+	
+	<!--팀 추가-->
+	<insert id="insertTeam">
+		INSERT INTO TEAM
+			(NAME)
+		VALUES
+			(#{name})
 	</insert>
 	
 	<!--금융사 추가-->
@@ -510,6 +537,7 @@
 			  , TEL3 = #{tel3}
 			  , POSITION = #{position}
 			  , STATUS = #{status}
+			  , TEAM_ID = #{team_id}
 			  WHERE ID = #{id}
 	</update>
 	

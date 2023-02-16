@@ -13,6 +13,7 @@ import com.project.mj.manager.domain.ManagerVO;
 import com.project.mj.manager.domain.MemoVO;
 import com.project.mj.manager.domain.SearchVO;
 import com.project.mj.manager.domain.StatusVO;
+import com.project.mj.manager.domain.TeamVO;
 
 @Service
 public interface ManagerService {
@@ -104,4 +105,10 @@ public interface ManagerService {
 	public List<MemoVO> getMemoList(int id);
 
 	public void deleteMemo(int id);
+
+	public List<TeamVO> getTeamList();
+
+	public void deleteTeam(int id);
+
+	public int insertTeam(TeamVO team);
 }

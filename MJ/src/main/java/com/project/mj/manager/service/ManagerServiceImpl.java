@@ -16,6 +16,7 @@ import com.project.mj.manager.domain.ManagerVO;
 import com.project.mj.manager.domain.MemoVO;
 import com.project.mj.manager.domain.SearchVO;
 import com.project.mj.manager.domain.StatusVO;
+import com.project.mj.manager.domain.TeamVO;
 
 @Service
 public class ManagerServiceImpl implements ManagerService {
@@ -243,6 +244,21 @@ public class ManagerServiceImpl implements ManagerService {
 	@Override
 	public void deleteMemo(int id) {
 		dao.deleteMemo(id);
+	}
+
+	@Override
+	public List<TeamVO> getTeamList() {
+		return dao.getTeamList();
+	}
+
+	@Override
+	public void deleteTeam(int id) {
+		dao.deleteTeam(id);
+	}
+
+	@Override
+	public int insertTeam(TeamVO team) {
+		return dao.insertTeam(team);
 	}
 
 }

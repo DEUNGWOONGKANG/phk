@@ -29,6 +29,7 @@ import com.project.mj.manager.domain.MemoVO;
 import com.project.mj.manager.domain.PageMaker;
 import com.project.mj.manager.domain.SearchVO;
 import com.project.mj.manager.domain.StatusVO;
+import com.project.mj.manager.domain.TeamVO;
 import com.project.mj.manager.service.ManagerService;
 
 @Controller
@@ -118,6 +119,8 @@ public class ManagerController {
   			nextView = confirmIpList();
   		}else if(menu.equals("menu6")) { //상태값관리
   			nextView = statusList();
+  		}else if(menu.equals("menu7")) { //팀관리
+  			nextView = teamList();
   		}
   		httpSession.setAttribute("menu", menu);
   		return nextView;
@@ -165,6 +168,8 @@ public class ManagerController {
 			search.setSearchKey("name");
 		}
 		search.setCri(cri);
+		ManagerVO myInfo = service.getManagerInfo(manager.getId());
+		search.setTeamId(myInfo.getTeam_id());
 		//고객리스트
 		List<CustomerVO> customerList = service.getCustomerList(search); 
 		int totalCnt = service.customerCnt(search);
@@ -485,6 +490,16 @@ public class ManagerController {
   		return nextView;
   	}
   	
+  	@GetMapping("/deleteTeam/{id}") 
+	private ModelAndView deleteTeam(@PathVariable("id") int id) {
+		ModelAndView nextView = new ModelAndView("teamList");
+		service.deleteTeam(id);
+		List<TeamVO> teamList = service.getTeamList();
+		
+		nextView.addObject("teamList", teamList);
+		return nextView;
+	}
+  	
   	//고객추가
   	@RequestMapping(value="/customerInsert", method=RequestMethod.POST) 
   	private ModelAndView customerInsert(CustomerVO customer, HttpServletResponse response) {
@@ -631,6 +646,9 @@ public class ManagerController {
   	@GetMapping("/managerAdd") 
   	public ModelAndView managerAdd(){ 
   		ModelAndView nextView = new ModelAndView("managerAdd");
+  		List<TeamVO> teamList = service.getTeamList();
+  		
+  		nextView.addObject("teamList", teamList);
   		return nextView;
   	}
   	
@@ -748,6 +766,9 @@ public class ManagerController {
 	private ModelAndView managerInfo(@PathVariable("id") String id, Criteria cri, HttpServletRequest request) {
 		ModelAndView nextView = new ModelAndView("managerInfo");
 		ManagerVO manager = service.getManagerInfo(id);
+		List<TeamVO> teamList = service.getTeamList();
+  		
+  		nextView.addObject("teamList", teamList);
 		nextView.addObject("manager", manager);
 		return nextView;
 	}
@@ -762,6 +783,31 @@ public class ManagerController {
   		List<FcVO> fcList = service.getFcList();
   		nextView.addObject("fcList", fcList);
   		nextView.addObject("customer", customer);
+  		return nextView;
+  	}
+  	
+  	@RequestMapping(value="/teamList", method=RequestMethod.POST) 
+  	private ModelAndView teamList() {
+  		ModelAndView nextView = new ModelAndView("teamList");
+  		List<TeamVO> teamList = service.getTeamList();
+  		
+  		nextView.addObject("teamList", teamList);
+  		return nextView;
+  	}
+  	
+  	@RequestMapping(value="/teamInsert", method=RequestMethod.POST) 
+  	private ModelAndView teamInsert(TeamVO team) {
+  		ModelAndView nextView = new ModelAndView("teamList");
+  		int ok = service.insertTeam(team);
+  		
+  		String saveYn = "N";
+  		if(ok == 1) {
+  			saveYn = "Y";
+  		}
+  		List<TeamVO> teamList = service.getTeamList();
+  		
+  		nextView.addObject("teamList", teamList);
+  		nextView.addObject("saveYn", saveYn);
   		return nextView;
   	}
 	

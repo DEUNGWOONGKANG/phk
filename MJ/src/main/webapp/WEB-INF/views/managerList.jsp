@@ -79,7 +79,8 @@ function check(){
 			      <th style="width:10%">NO</th>
 			      <th style="width:20%">ID</th>
 			      <th style="width:20%">직원명</th>
-			      <th style="width:20%">직책</th>
+			      <th style="width:10%">팀</th>
+			      <th style="width:10%">직책</th>
 			      <th style="width:10%">연락처</th>
 			      <th style="width:10%">상태</th>
 			      <th style="width:10%">관리</th>
@@ -94,6 +95,9 @@ function check(){
 				      </td>
 				      <td>
 				      	${manager.name}
+					  </td>
+				      <td>
+				      	${manager.team_name}
 					  </td>
 				      <td>
 				      	${manager.position}

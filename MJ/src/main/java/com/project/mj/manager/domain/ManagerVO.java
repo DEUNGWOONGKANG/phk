@@ -12,6 +12,8 @@ public class ManagerVO {
 	private String etctel3;
 	private String position;
 	private String status;
+	private Integer team_id;
+	private String team_name;
 	
 	public String getId() {
 		return id;
@@ -78,6 +80,18 @@ public class ManagerVO {
 	}
 	public void setPosition(String position) {
 		this.position = position;
+	}
+	public Integer getTeam_id() {
+		return team_id;
+	}
+	public void setTeam_id(Integer team_id) {
+		this.team_id = team_id;
+	}
+	public String getTeam_name() {
+		return team_name;
+	}
+	public void setTeam_name(String team_name) {
+		this.team_name = team_name;
 	}
 	
 }

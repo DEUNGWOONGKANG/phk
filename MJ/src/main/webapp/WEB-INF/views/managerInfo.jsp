@@ -91,6 +91,17 @@ function goback(){
 				  </td>
 			    </tr>
 			    <tr>
+			      <th>팀</th>
+				  <td>
+				  	<select id="team_id" name="team_id">
+				  		<option value=""></option>
+						<c:forEach var="data" items="${teamList}">
+							<option value="${data.id}" <c:if test="${manager.team_id eq data.id}">selected</c:if>>${data.name}</option>
+						</c:forEach>
+				  	</select>
+				  </td>
+			    </tr>
+			    <tr>
 			      <th>상태</th>
 				  <td>
 				  	<select id="status" name="status">
